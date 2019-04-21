@@ -4,12 +4,11 @@ import pandas as pd
 import pickle
 import os
 from fastai.vision import *
-#from sklearn.feature_extraction.text import CountVectorizer
-#from sklearn.naive_bayes import MultinomialNB
-#from sklearn.externals import joblib
+#fast.ai fibrary used - a deeplearning library
 from PIL import ImageFile
 
-#load data 
+#load data, the data of the two initater training data/images is stored at the path mentioned below 
+#here transform function used to magnify and set the images of cancer cell.
 PATH_ts1 = Path('../data/CombinedImages')
 tfms = get_transforms(flip_vert = True)
 data = (ImageItemList.from_folder(PATH_ts1) 
@@ -22,11 +21,12 @@ data = (ImageItemList.from_folder(PATH_ts1)
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-#load model
+#load model, loding the weights after training. Training done in 30it_0401(refer to python notebook)
+#the model created is a convolutional neural network
 learn = create_cnn(data, models.resnet18, metrics =accuracy)
 learn.load('30it_0401')
 
-
+#flask used for showing the prediction results on the website
 app = Flask(__name__)
 
 
@@ -39,10 +39,7 @@ def home():
 	return render_template('home.html')
 
 
-
-# when saving the file
-
-
+#used to load home.html
 @app.route('/',methods=['POST'])
 def predict():
     #model
@@ -54,7 +51,7 @@ def predict():
                                                                                         #f.filename to save with name
                                                                                         #of uploaded file
                                                                                         #(although this will eat space)
-        #prediction
+        #prediction, one image given to initiate the training
         img = open_image('instance/images/pic.jpeg')
         output = str(learn.predict(img))
         ans = output.split(' ')[1]
